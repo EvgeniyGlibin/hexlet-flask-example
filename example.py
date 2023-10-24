@@ -51,7 +51,18 @@ def get_users():
         search=search,
     )
 
+@app.route('/users/new')
+def users_new():
+    user = {'name': '',
+            'email': '',
+            'password': '',
+            'passwordConfirmation': '',
+            'city': ''}
+    errors = {}
 
-# def filter_name(user, search):
-#     return user.lower().startswith(search.lower())
+    return render_template(
+        'users/new.html',
+        user=user,
+        errors=errors
+    )
 

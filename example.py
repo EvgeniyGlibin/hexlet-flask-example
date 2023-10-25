@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, flash, get_flashed_messages
 from flask import render_template
 import os
 from validator import validate
@@ -8,6 +8,10 @@ import json
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+# устанавливаем секретный ключ для работы с сессиями (Flash-сообщения)
+app.secret_key = "secret_key"
+
 
 @app.route('/')
 def hello_world():
@@ -37,21 +41,6 @@ users = [
     'mike', 'mishel', 'adel', 'keks', 'kamila'
 ]
 
-
-
-@app.route('/users')
-def get_users():
-    result = users
-    search = request.args.get('term', '')
-    if search:
-        result = [user for user in users if search in user]
-
-    return render_template(
-        'users/index.html',
-        users=result,
-        search=search,
-    )
-
 @app.route('/users/new')
 def users_new():
     user = {'name': '',
@@ -65,6 +54,7 @@ def users_new():
         errors=errors
     )
 
+
 @app.post('/users')
 def users_post():
     user = request.form.to_dict()
@@ -75,6 +65,26 @@ def users_post():
             user=user,
             errors=errors
         ), 422
+
     with open('data_users.json', 'w+', encoding="utf-8") as file:
         file.write(json.dumps(user))
+    flash('User was added successful', 'success')  #  flash сообщение активируется, показано будеет на другой страничке
+
     return redirect('/users', code=302)
+
+
+@app.route('/users')
+def get_users():
+    result = users
+    search = request.args.get('term', '')
+    if search:
+        result = [user for user in users if search in user]
+    # Извлечение flash-сообщений, которые установлены на предыдущем запросе
+    messages = get_flashed_messages(with_categories=True)
+    print(messages)
+    return render_template(
+        'users/index.html',
+        users=result,
+        search=search,
+        messages=messages
+    )

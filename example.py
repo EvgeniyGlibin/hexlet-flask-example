@@ -1,17 +1,18 @@
-from flask import Flask, request
+from flask import Flask, request, redirect
 from flask import render_template
+import os
+from validator import validate
+import json
 
 # Это callable WSGI-приложение
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 @app.route('/')
 def hello_world():
     print(request.headers)
     return f'Hello, World!'
-
-@app.route('/json/')
-def json():
-    return {'json': 42}
 
 @app.route('/html/')
 def html():
@@ -55,8 +56,6 @@ def get_users():
 def users_new():
     user = {'name': '',
             'email': '',
-            'password': '',
-            'passwordConfirmation': '',
             'city': ''}
     errors = {}
 
@@ -66,3 +65,16 @@ def users_new():
         errors=errors
     )
 
+@app.post('/users')
+def users_post():
+    user = request.form.to_dict()
+    errors = validate(user)
+    if errors:
+        render_template(
+            '/users/new.html',
+            user=user,
+            errors=errors
+        ), 422
+    with open('data_users.json', 'w+', encoding="utf-8") as file:
+        file.write(json.dumps(user))
+    return redirect('/users', code=302)

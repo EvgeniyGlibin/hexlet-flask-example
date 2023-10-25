@@ -1,8 +1,9 @@
 <!-- templates/users/new.html -->
+<h1>New User</h1>
 <form action="/users" method="post">
     <div>
       <label>
-        Имя
+        Nickname
         <input type="text" name="name" value="{{ user.name }}">
       </label>
       {% if errors['name'] %}
@@ -20,21 +21,6 @@
       </div>
     <div>
       <label>
-        Пароль
-        <input type="password" required name="password" value="{{ user.password }}">
-      </label>
-      {% if errors['password'] %}
-        <div>{{ errors['password'] }}</div>
-      {% endif %}
-      </div>
-    <div>
-      <label>
-        Подтверждение пароля
-        <input type="password" required name="passwordConfirmation" value="{{ user.passwordConfirmation }}">
-      </label>
-    </div>
-    <div>
-      <label>
         Город
         <select name="city">
           <option value="">Select</option>
@@ -47,5 +33,5 @@
         <div>{{ errors['city'] }}</div>
       {% endif %}
     </div>
-    <input type="submit" value="Sign Up">
+    <input type="submit" value="Submit">
 </form>
